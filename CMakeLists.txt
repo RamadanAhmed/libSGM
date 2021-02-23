@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.18)
 project(libsgm VERSION 2.7.0 LANGUAGES CXX CUDA)
 # Set Libraries default visibility to hidden
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -14,7 +14,6 @@ option(ENABLE_SAMPLES       "Build samples" ON)
 option(ENABLE_TESTS         "Test library" OFF)
 option(BUILD_OPENCV_WRAPPER "Make library compatible with cv::Mat and cv::cuda::GpuMat of OpenCV" ON)
 
-#set(CUDA_ARCH "-arch=sm_50" CACHE STRING "Value of the NVCC -arch option.")
 option(AUTO_DETECT_ARCH "Detect local GPU compute arch automatically" ON)
 ###############################     Options       ###########################################
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <stdlib.h>
 #include <iostream>
+#include <chrono>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/cuda.hpp>
@@ -34,28 +35,35 @@ int main(int argc, char* argv[])
 {
 	ASSERT_MSG(argc >= 3, "usage: stereosgm left_img right_img [disp_size]");
 
-	cv::Mat  left = cv::imread(argv[1], -1);
-	cv::Mat right = cv::imread(argv[2], -1);
+	cv::Mat  left = cv::imread(argv[1], 0);
+	cv::Mat right = cv::imread(argv[2], 0);
 	const int disp_size = argc > 3 ? std::atoi(argv[3]) : 128;
 
 	ASSERT_MSG(left.size() == right.size() && left.type() == right.type(), "input images must be same size and type.");
 	ASSERT_MSG(left.type() == CV_8U || left.type() == CV_16U, "input image format must be CV_8U or CV_16U.");
 	ASSERT_MSG(disp_size == 64 || disp_size == 128 || disp_size == 256, "disparity size must be 64, 128 or 256.");
 
-	sgm::LibSGMWrapper sgm(disp_size);
+	sgm::LibSGMWrapper sgm(disp_size, 10,120,0.95,false, sgm::PathType::SCAN_4PATH, 0,1);
 	cv::Mat disparity;
 
-	try {
-		cv::cuda::GpuMat d_left, d_right, d_disparity;
+	cv::cuda::GpuMat d_left(left.size().height,left.size().width, CV_8UC1);
+	cv::cuda::GpuMat d_right(left.size().height,left.size().width, CV_8UC1);
+	cv::cuda::GpuMat d_disparity(left.size().height,left.size().width, CV_16S);
+
+	auto dur = 0ll;
+	for(int i = 0; i < 10; ++i){
+		auto t1 = std::chrono::high_resolution_clock::now();
 		d_left.upload(left);
 		d_right.upload(right);
+
 		sgm.execute(d_left, d_right, d_disparity);
 		d_disparity.download(disparity);
+		auto t2 = std::chrono::high_resolution_clock::now();
+		dur += std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count();
 	}
-	catch (const cv::Exception& e) {
-		std::cerr << e.what() << std::endl;
-		return e.code == cv::Error::GpuNotSupported ? 1 : -1;
-	}
+	
+	std::cout << "TIME" << dur/10 << '\n';
+
 
 	// show image
 	cv::Mat mask = disparity == sgm.getInvalidDisparity();

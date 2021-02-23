@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	const cv::Mat I1 = cv::imread(parser.get<cv::String>( "@left_img"), -1);
-	const cv::Mat I2 = cv::imread(parser.get<cv::String>("@right_img"), -1);
+	const cv::Mat I1 = cv::imread(parser.get<cv::String>( "@left_img"), 0);
+	const cv::Mat I2 = cv::imread(parser.get<cv::String>("@right_img"), 0);
 
 	if (!parser.check()) {
 		parser.printErrors();
