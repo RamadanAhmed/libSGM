@@ -33,7 +33,7 @@ endif()
 set(generated_headers "${CMAKE_CURRENT_BINARY_DIR}/generated_headers")
 set(libsgm_export "${generated_headers}/libsgm_export.h")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/libsgm_config.h.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/libsgm_config.h.in
                ${generated_headers}/libsgm_config.h)
 
 add_library(${PROJECT_NAME})
